@@ -60,3 +60,6 @@ V5 does not claim that every astrology feature is production-validated. Planetar
 
 ## V7
 Role-aware User/Astrologer/Admin dashboard UI, chat UI foundation, browser Supabase client, Realtime message subscription, and deployment environment documentation. Legacy JSON routes remain until the next Supabase backend migration.
+
+## V9 Daily Panchang Upgrade
+The Panchang tab now calculates daily Panchang values from the built-in astronomical engine using the selected date, latitude, longitude and timezone. It includes Tithi and end time, Nakshatra/Pada and end time, Yoga, Karana sequence, Vara, sunrise/sunset, moonrise/moonset, Sun/Moon Rashi, Ritu, Vikram/Shaka/Kali year, Abhijit, Rahu Kaal, Yamaganda, Gulika, Disha Shool, daytime Lagna periods, Choghadiya, Chandra Bala and Tara Bala reference data. It is not a fixed demo table; changing the date/location changes the calculations.
