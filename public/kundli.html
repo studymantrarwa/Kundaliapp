@@ -12,7 +12,7 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 .chart text{font-family:system-ui,sans-serif}
 .cell{font-size:5.2px;font-weight:900;fill:#111}.planet{font-size:3.35px;font-weight:800;fill:#8a1c1c}
 .legend{font-size:12px;color:#667085}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}.dasha-tree details{border:1px solid #e4e8ef;border-radius:12px;margin:8px 0;background:#fff;overflow:hidden}.dasha-tree summary{cursor:pointer;list-style:none;padding:11px 12px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px}.dasha-tree summary::-webkit-details-marker{display:none}.dasha-tree summary:before{content:"▶";font-size:10px;transition:transform .15s}.dasha-tree details[open]>summary:before{transform:rotate(90deg)}.dasha-md>summary{color:#2457c5;background:#f5f7ff}.dasha-ad{margin:0 10px 8px}.dasha-ad>summary{color:#217a3a;background:#f1fbf3}.dasha-pd{margin:0 10px 8px}.dasha-pd>summary{color:#9a5b00;background:#fff8ea;font-weight:700}.dasha-body{padding:0 10px 2px}.dasha-dates{font-size:12px;color:#667085;font-weight:500}.dasha-empty{padding:10px 12px;color:#667085;font-size:13px}.dasha-help{font-size:12px;color:#667085;margin:0 0 10px;line-height:1.5}
 .table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #eee;padding:7px;text-align:left}
 .scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-table{width:100%;border-collapse:collapse;font-size:13px}.detail-table td{border-bottom:1px solid #edf0f4;padding:8px 6px;vertical-align:top}.detail-table td:first-child{font-weight:700;color:#475467;width:42%}.section-title{margin:4px 0 12px}.note{font-size:12px;color:#667085;line-height:1.5}.phala{line-height:1.7}.phala-summary{padding:12px;border:1px solid #dfe5ec;border-radius:12px;background:#f8fafc;margin-bottom:10px}.phala-item{border:1px solid #edf0f4;border-radius:12px;padding:12px;margin:9px 0;background:#fbfcfe}.phala-item h3{margin:0 0 6px;font-size:15px}.phala-text{line-height:1.75}.phala-factors{margin-top:10px;padding:9px 10px;border-radius:10px;background:#f7f8fa;font-size:12px}.phala-factors ul{margin:6px 0 0;padding-left:20px}.phala-signal{font-size:11px;color:#667085;margin-top:8px}.phala-note{margin-top:12px;padding:10px;border-radius:10px;background:#fff8e8;color:#6b4f00;font-size:12px;line-height:1.6}@media(max-width:760px){.detail-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.chart-shell{grid-template-columns:1fr}.wrap{padding:10px}.grid{grid-template-columns:1fr}.chart{max-width:96vw;margin:auto}}
@@ -107,5 +107,18 @@ document.getElementById("yogas").innerHTML=(data.yogas||[]).length?(data.yogas.m
 document.getElementById("doshas").innerHTML=(data.doshas||[]).length?(data.doshas.map(x=>`<div class="badge">${x.name}<br><small>${x.basis}<br>${x.severity}</small></div>`).join("")):`<p>No configured Ashubh Yoga/Dosha rule matched for this chart.</p><small>${data.ruleSummary?.doshaRulesChecked||0} dosha rules checked.</small>`;
 
 const m=data.dasha?.mahadasha||[];
-document.getElementById("dasha").innerHTML=m.map((x,i)=>`<div style="margin:8px 0"><b style="color:#2457c5">MD: ${x.lord}</b> · ${x.start} → ${x.end}<div>${(x.antardasha||[]).map(a=>`<span class="badge" style="background:#e8f7ec">AD ${a.lord}: ${a.start} → ${a.end}</span>`).join("")}</div></div>`).join("");
+function renderPD(pd){
+  if(!pd?.length) return `<div class="dasha-empty">इस अंतर्दशा के लिए प्रात्यंतर दशा उपलब्ध नहीं है।</div>`;
+  return pd.map(z=>`<details class="dasha-pd"><summary><span>PD: ${esc(z.lord||"—")}</span><span class="dasha-dates">${esc(z.start||"—")} → ${esc(z.end||"—")}</span></summary></details>`).join("");
+}
+function renderAD(a, mdLord){
+  const pds=(data.dasha?.mahadasha||[]).find(x=>x.lord===mdLord)?.pratyantardasha||[];
+  const adPds=pds.filter(z=>z.antardasha===a.lord && z.start>=a.start && z.end<=a.end);
+  return `<details class="dasha-ad"><summary><span>AD: ${esc(a.lord||"—")}</span><span class="dasha-dates">${esc(a.start||"—")} → ${esc(a.end||"—")}</span></summary><div class="dasha-body">${renderPD(adPds)}</div></details>`;
+}
+function renderMD(x){
+  const ads=x.antardasha||[];
+  return `<details class="dasha-md"><summary><span>MD: ${esc(x.lord||"—")}</span><span class="dasha-dates">${esc(x.start||"—")} → ${esc(x.end||"—")}</span></summary><div class="dasha-body">${ads.length?ads.map(a=>renderAD(a,x.lord)).join(""):`<div class="dasha-empty">इस महादशा के लिए अंतर्दशा उपलब्ध नहीं है।</div>`}</div></details>`;
+}
+document.getElementById("dasha").innerHTML=`<div class="dasha-tree"><p class="dasha-help">किसी <b>महादशा</b> पर टैप करें → उसकी <b>अंतर्दशा</b> खुलेगी। फिर किसी <b>अंतर्दशा</b> पर टैप करें → उसकी <b>प्रत्यंतर दशाएं</b> दिखाई देंगी।</p>${m.map(renderMD).join("")}</div>`;
 </script></body></html>
