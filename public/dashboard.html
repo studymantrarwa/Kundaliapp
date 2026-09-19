@@ -34,4 +34,4 @@ async function approve(id,status){try{await api('/api/admin-astrologer',{method:
 function reviews(c){c.innerHTML=card('Reviews','Reviews are stored per conversation. A review UI can be opened after a chat is closed.')}
 $('#logout').onclick=async()=>{try{const sb=await window.SM_SUPABASE.init();if(sb)await sb.auth.signOut()}catch(e){}localStorage.removeItem('studyMantraToken');location.href='/auth.html'};
 (async()=>{try{const x=await api('/api/me');me=x;if(!me.user)throw Error('Login required');$('#identity').textContent=(me.user.name||me.user.email)+' · '+me.user.email;$('#roleBadge').textContent=me.user.role;navFor(me.user.role);show('home')}catch(e){$('#content').innerHTML=card('Login required',`<p>${esc(e.message)}</p><a class="btn primary" href="/auth.html">Login / Sign Up</a>`)}})();
-</script></body></html>
+</script><div style="text-align:center;padding:18px"><a href="/admin-login.html" style="color:#f2bd18;text-decoration:none;font-weight:800">Admin Login</a></div></body></html>

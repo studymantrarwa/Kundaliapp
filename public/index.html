@@ -87,5 +87,5 @@ a{text-decoration:none;color:inherit}.top{height:70px;display:flex;align-items:c
 <script>
 (async()=>{try{const t=localStorage.getItem("studyMantraToken");if(!t)return;const r=await fetch("/api/me",{headers:{Authorization:"Bearer "+t}});if(r.ok){const j=await r.json();const a=document.getElementById("accountLink");if(a){a.textContent="Account";a.href="/dashboard.html"}}}catch(e){}})();
 </script>
-</body>
+<div style="text-align:center;padding:18px"><a href="/admin-login.html" style="color:#f2bd18;text-decoration:none;font-weight:800">Admin Login</a></div></body>
 </html>
