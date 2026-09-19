@@ -1,5 +1,6 @@
 const handlers = {
   "_lib": null,
+  "admin": require("../lib/api/admin"),
   "admin-astrologer": require("../lib/api/admin-astrologer"),
   "astrologer-settings": require("../lib/api/astrologer-settings"),
   "astrologer-profile": require("../lib/api/astrologer-profile"),
