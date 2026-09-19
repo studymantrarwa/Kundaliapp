@@ -86,34 +86,37 @@ function chartSvg(ch){
    * This prevents 3/5/9/11 (and every other house) from drifting into
    * neighbouring compartments.
    */
+  // Each sign anchor is placed INSIDE its own fixed house polygon.
+  // The previous version used anchors near the inner-diamond corners, which
+  // put several outer-house numbers outside their clipping regions.
   const signPos={
-    1:{x:50,y:40},
-    2:{x:24.1,y:27.7},
-    3:{x:27.7,y:24.1},
-    4:{x:40,y:50},
-    5:{x:27.7,y:75.9},
-    6:{x:24.1,y:72.3},
-    7:{x:50,y:60},
-    8:{x:75.9,y:72.3},
-    9:{x:72.3,y:75.9},
-    10:{x:60,y:50},
-    11:{x:72.3,y:24.1},
-    12:{x:75.9,y:27.7}
+    1:{x:50,y:25},
+    2:{x:25,y:10},
+    3:{x:10,y:25},
+    4:{x:25,y:50},
+    5:{x:10,y:75},
+    6:{x:25,y:90},
+    7:{x:50,y:75},
+    8:{x:75,y:90},
+    9:{x:90,y:75},
+    10:{x:75,y:50},
+    11:{x:90,y:25},
+    12:{x:75,y:10}
   };
 
   const planetPos={
-    1:{x:50,y:27},
-    2:{x:25,y:13},
-    3:{x:13,y:25},
-    4:{x:25,y:50},
-    5:{x:13,y:75},
-    6:{x:25,y:87},
-    7:{x:50,y:73},
-    8:{x:75,y:87},
-    9:{x:87,y:75},
-    10:{x:75,y:50},
-    11:{x:87,y:25},
-    12:{x:75,y:13}
+    1:{x:50,y:34},
+    2:{x:25,y:16},
+    3:{x:16,y:25},
+    4:{x:34,y:50},
+    5:{x:16,y:75},
+    6:{x:25,y:84},
+    7:{x:50,y:66},
+    8:{x:75,y:84},
+    9:{x:84,y:75},
+    10:{x:66,y:50},
+    11:{x:84,y:25},
+    12:{x:75,y:16}
   };
 
   // Safe polygon clips for the 12 fixed house compartments.
