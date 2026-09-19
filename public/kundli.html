@@ -10,11 +10,11 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 .chart{width:100%;aspect-ratio:1;border:2px solid #111;position:relative;background:#fff;overflow:hidden}
 .chart svg{width:100%;height:100%;display:block}
 .chart text{font-family:system-ui,sans-serif}
-.cell{font-size:4.1px;font-weight:800;fill:#111}.planet{font-size:3.6px;font-weight:800;fill:#8a1c1c}
+.cell{font-size:5.2px;font-weight:900;fill:#111}.planet{font-size:3.35px;font-weight:800;fill:#8a1c1c}
 .legend{font-size:12px;color:#667085}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}
 .table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #eee;padding:7px;text-align:left}
-.scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-table{width:100%;border-collapse:collapse;font-size:13px}.detail-table td{border-bottom:1px solid #edf0f4;padding:8px 6px;vertical-align:top}.detail-table td:first-child{font-weight:700;color:#475467;width:42%}.section-title{margin:4px 0 12px}.note{font-size:12px;color:#667085;line-height:1.5}.phala{line-height:1.7}.phala li{margin:5px 0}@media(max-width:760px){.detail-grid{grid-template-columns:1fr}}
+.scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-table{width:100%;border-collapse:collapse;font-size:13px}.detail-table td{border-bottom:1px solid #edf0f4;padding:8px 6px;vertical-align:top}.detail-table td:first-child{font-weight:700;color:#475467;width:42%}.section-title{margin:4px 0 12px}.note{font-size:12px;color:#667085;line-height:1.5}.phala{line-height:1.7}.phala-summary{padding:12px;border:1px solid #dfe5ec;border-radius:12px;background:#f8fafc;margin-bottom:10px}.phala-item{border:1px solid #edf0f4;border-radius:12px;padding:12px;margin:9px 0;background:#fbfcfe}.phala-item h3{margin:0 0 6px;font-size:15px}.phala-text{line-height:1.75}.phala-factors{margin-top:10px;padding:9px 10px;border-radius:10px;background:#f7f8fa;font-size:12px}.phala-factors ul{margin:6px 0 0;padding-left:20px}.phala-signal{font-size:11px;color:#667085;margin-top:8px}.phala-note{margin-top:12px;padding:10px;border-radius:10px;background:#fff8e8;color:#6b4f00;font-size:12px;line-height:1.6}@media(max-width:760px){.detail-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.chart-shell{grid-template-columns:1fr}.wrap{padding:10px}.grid{grid-template-columns:1fr}.chart{max-width:96vw;margin:auto}}
 </style></head><body>
 <div class="wrap">
@@ -29,8 +29,8 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 <div class="card"><h2 class="section-title">घटक (अशुभ) — जन्म राशि आधारित</h2><div id="ghatakDetails"></div><p class="note">यह पारंपरिक घटक-चक्र की एक प्रकाशित तालिका पर आधारित है; अलग परंपराओं में तालिका बदल सकती है।</p></div>
 <div class="card"><h2 class="section-title">जन्म फलादेश</h2><div id="phala" class="phala"></div></div>
 <div class="chart-shell">
-<section class="card"><h2>D1 / Rashi / Lagna — North Indian</h2><div id="d1"></div><p class="legend">North Indian fixed-house layout. House 1 is the top-centre diamond. Signs are assigned from Lagna.</p></section>
-<section class="card"><h2>D9 / Navamsa — North Indian</h2><div id="d9"></div><p class="legend">D9 uses the standard movable/fixed/dual Navamsa starting rule.</p></section>
+<section class="card"><h2>D1 / Rashi / Lagna — North Indian</h2><div id="d1"></div><p class="legend">North Indian fixed-house layout. केवल राशि संख्या दिखाई जाती है; सभी संख्या और ग्रह-चिह्न chart की सीमा के अंदर रखे गए हैं।</p></section>
+<section class="card"><h2>D9 / Navamsa — North Indian</h2><div id="d9"></div><p class="legend">D9 में केवल राशि संख्या दिखाई जाती है। Navamsa placement standard movable/fixed/dual starting rule से है।</p></section>
 </div>
 <div class="card"><h2>Planetary positions</h2><div class="scroll"><table class="table"><thead><tr><th>Planet</th><th>Sign</th><th>House</th><th>Degree</th><th>Nakshatra</th><th>Pada</th><th>R</th></tr></thead><tbody id="planets"></tbody></table></div></div>
 <div class="card"><h2>Vimshottari Dasha</h2><div id="dasha"></div></div>
@@ -71,16 +71,29 @@ const gh=bd.ghatak||{};
 document.getElementById("ghatakDetails").innerHTML=table([
  ["राशि",gh.moonRashi],["माह",gh.masa],["तिथि",gh.tithi],["दिन",gh.day],["नक्षत्र",gh.nakshatra],["प्रहर",gh.prahar],["लग्न",gh.lagna],["योग",gh.yoga],["करण",gh.karana]
 ]);
-document.getElementById("phala").innerHTML=`<p><b>${esc(data.phalaDesh?.summary||"—")}</b></p><ul>${(data.phalaDesh?.points||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="note">${esc(data.phalaDesh?.note||"")}</p>`;
+document.getElementById("phala").innerHTML=`<div class="phala-summary"><b>${esc(data.phalaDesh?.summary||"—")}</b></div>${(data.phalaDesh?.points||[]).map(x=>{if(typeof x==="string")return `<div class="phala-item">${esc(x)}</div>`;const fs=(x.factors||[]).map(f=>`<li>${esc(f)}</li>`).join("");return `<div class="phala-item"><h3>${esc(x.title||"फलादेश")}</h3><div class="phala-text">${esc(x.text||"")}</div>${fs?`<div class="phala-factors"><b>ज्योतिषीय आधार:</b><ul>${fs}</ul></div>`:""}<div class="phala-signal">${esc(x.signal||"")}</div></div>`}).join("")}<div class="phala-note"><b>महत्वपूर्ण नोट:</b> ${esc(data.phalaDesh?.note||"")}</div>`;
 
 function chartSvg(ch){
   const lines=[[0,0,100,100],[100,0,0,100],[50,0,0,50],[50,0,100,50],[0,50,50,100],[100,50,50,100]];
-  const pos={1:[50,18],2:[25,13],3:[13,28],4:[18,50],5:[13,72],6:[25,87],7:[50,82],8:[75,87],9:[87,72],10:[82,50],11:[87,28],12:[75,13]};
-  let svg='<svg viewBox="0 0 100 100" role="img" aria-label="North Indian kundli">';
-  for(const l of lines)svg+=`<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#111" stroke-width=".65"/>`;
-  for(const h of ch){const p=pos[h.house]||[50,50]; const planets=h.planets||[];
-    svg+=`<text x="${p[0]}" y="${p[1]-4}" text-anchor="middle" class="cell">${h.sign} ${h.signName||''}</text>`;
-    planets.forEach((x,i)=>{svg+=`<text x="${p[0]}" y="${p[1]+4+i*4}" text-anchor="middle" class="planet">${short[x]||x}</text>`});
+  // Safe interior anchor points for the 12 North-Indian sign cells.
+  // Only the rashi number is shown; the sign name is intentionally hidden.
+  const pos={
+    1:[50,25], 2:[27,18], 3:[19,34], 4:[27,50], 5:[19,66], 6:[27,82],
+    7:[50,75], 8:[73,82], 9:[81,66], 10:[73,50], 11:[81,34], 12:[73,18]
+  };
+  let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="North Indian kundli">';
+  for(const l of lines)svg+=`<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#111" stroke-width=".65" vector-effect="non-scaling-stroke"/>`;
+  for(const h of ch){
+    const p=pos[h.house]||[50,50];
+    const planets=h.planets||[];
+    // Rashi number only — no Hindi/English rashi name inside the chart.
+    svg+=`<text x="${p[0]}" y="${p[1]-2.5}" text-anchor="middle" dominant-baseline="middle" class="cell">${h.sign}</text>`;
+    const start=p[1]+3.5;
+    const step=3.7;
+    planets.forEach((x,i)=>{
+      const yy=start+i*step;
+      svg+=`<text x="${p[0]}" y="${yy}" text-anchor="middle" dominant-baseline="middle" class="planet">${short[x]||x}</text>`;
+    });
   }
   return svg+'</svg>';
 }
