@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Mantra Kundli Chart</title><link rel="stylesheet" href="/style.css">
+<style>
+body{margin:0;background:#f5f7fb;color:#172033;font-family:system-ui,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.card{background:#fff;border:1px solid #e2e7ef;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 4px 18px #0000000a}
+button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+.chart-shell{display:grid;grid-template-columns:minmax(280px,620px) 1fr;gap:16px;align-items:start}
+.chart{width:100%;aspect-ratio:1;border:2px solid #111;position:relative;background:#fff;overflow:hidden}
+.chart svg{width:100%;height:100%;display:block}
+.chart text{font-family:system-ui,sans-serif}
+.cell{font-size:13px;font-weight:700;fill:#111}.planet{font-size:12px;font-weight:700;fill:#8a1c1c}
+.legend{font-size:12px;color:#667085}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}
+.table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #eee;padding:7px;text-align:left}
+.scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}
+@media(max-width:760px){.chart-shell{grid-template-columns:1fr}.wrap{padding:10px}.grid{grid-template-columns:1fr}.chart{max-width:96vw;margin:auto}}
+</style></head><body>
+<div class="wrap">
+<div class="top"><h1>Study Mantra Kundli</h1><button onclick="location.href='/kundli.html'">← New Kundli</button></div>
+<div id="meta" class="card">Loading calculation…</div>
+<div id="accuracy" class="card"></div>
+<div class="chart-shell">
+<section class="card"><h2>D1 / Rashi / Lagna — North Indian</h2><div id="d1"></div><p class="legend">North Indian fixed-house layout. House 1 is the top-centre diamond. Signs are assigned from Lagna.</p></section>
+<section class="card"><h2>D9 / Navamsa — North Indian</h2><div id="d9"></div><p class="legend">D9 uses the standard movable/fixed/dual Navamsa starting rule.</p></section>
+</div>
+<div class="card"><h2>Planetary positions</h2><div class="scroll"><table class="table"><thead><tr><th>Planet</th><th>Sign</th><th>House</th><th>Degree</th><th>Nakshatra</th><th>Pada</th><th>R</th></tr></thead><tbody id="planets"></tbody></table></div></div>
+<div class="card"><h2>Vimshottari Dasha</h2><div id="dasha"></div></div>
+<div class="grid"><div class="card"><h2>Shubh Yog</h2><div id="yogas"></div></div><div class="card"><h2>Ashubh Yog / Dosha</h2><div id="doshas"></div></div></div>
+</div>
+<script>
+const data=JSON.parse(localStorage.getItem("studyMantraLastKundli")||"null");
+if(!data){document.getElementById("meta").textContent="No Kundli data found. Please create a new Kundli.";throw new Error("No data")}
+const S=["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrischika","Dhanu","Makara","Kumbha","Meena"];
+const short={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"};
+document.getElementById("meta").innerHTML="<b>"+(data.input?.name||"Kundli")+"</b> · "+(data.input?.dob||"")+" "+(data.input?.time||"")+" · "+(data.input?.place||"")+"<br>Lagna: <b>"+data.lagna.signName+"</b> · Ayanamsa: "+data.ayanamsa;
+document.getElementById("accuracy").innerHTML=data.engine?.productionRequired
+?"<div class='warn'><b>Development fallback active.</b> This calculation is not production-accurate until a local Swiss Ephemeris bridge is configured.</div>"
+:"<div><b>Local Swiss Ephemeris provider active.</b> "+(data.engine?.accuracyNote||"")+"</div>";
+
+function chartSvg(ch){
+  // Standard North Indian diamond geometry.
+  const lines=[
+    [0,0,100,100],[100,0,0,100],
+    [50,0,0,50],[50,0,100,50],[0,50,50,100],[100,50,50,100],
+    [0,0,100,0],[0,100,100,100],[0,0,0,100],[100,0,100,100]
+  ];
+  const housePos={
+    1:[50,17],2:[25,12],3:[12,25],4:[17,50],5:[12,75],6:[25,88],
+    7:[50,83],8:[75,88],9:[88,75],10:[83,50],11:[88,25],12:[75,12]
+  };
+  let svg='<svg viewBox="0 0 100 100" role="img" aria-label="North Indian kundli">';
+  for(const l of lines) svg+=`<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#111" stroke-width=".65"/>`;
+  for(const h of ch){
+    const p=housePos[h.house]||[50,50], ps=(h.planets||[]).map(x=>short[x]||x).join(" ");
+    svg+=`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" class="cell">${h.sign}</text>`;
+    svg+=`<text x="${p[0]}" y="${p[1]+5}" text-anchor="middle" class="planet">${ps}</text>`;
+  }
+  return svg+"</svg>";
+}
+function renderChart(id,ch){document.getElementById(id).innerHTML='<div class="chart">'+chartSvg(ch)+'</div>'}
+renderChart("d1",data.charts.D1);
+renderChart("d9",data.charts.D9);
+
+const rows=Object.values(data.planets||{}).map(p=>`<tr><td>${p.name}</td><td>${p.signName}</td><td>${p.house}</td><td>${p.longitude.toFixed(4)}°</td><td>${p.nakshatra.name}</td><td>${p.nakshatra.pada}</td><td>${p.retrograde?"Yes":"No"}</td></tr>`).join("");
+document.getElementById("planets").innerHTML=rows;
+
+document.getElementById("yogas").innerHTML=(data.yogas||[]).length?(data.yogas.map(x=>`<div class="badge">${x.name}<br><small>${x.basis}</small></div>`).join("")):"No configured yoga rule matched.";
+document.getElementById("doshas").innerHTML=(data.doshas||[]).length?(data.doshas.map(x=>`<div class="badge">${x.name}<br><small>${x.basis}<br>${x.severity}</small></div>`).join("")):"No configured dosha rule matched.";
+
+const m=data.dasha?.mahadasha||[];
+document.getElementById("dasha").innerHTML=m.map((x,i)=>`<div style="margin:8px 0"><b style="color:#2457c5">MD: ${x.lord}</b> · ${x.start} → ${x.end}<div>${(x.antardasha||[]).map(a=>`<span class="badge" style="background:#e8f7ec">AD ${a.lord}: ${a.start} → ${a.end}</span>`).join("")}</div></div>`).join("");
+</script></body></html>
