@@ -2,13 +2,47 @@
 .num-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:14px}.num-box{padding:12px;border:1px solid #ddd;border-radius:12px;background:#fafafa}.num-box b{display:block;font-size:20px;margin-top:4px}.num-muted{color:#666;font-size:13px}.num-section{margin-top:14px}.num-table{width:100%;border-collapse:collapse}.num-table td,.num-table th{padding:9px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}.num-table th{font-weight:700}.num-actions{display:flex;gap:8px;flex-wrap:wrap}.num-actions input{flex:1;min-width:150px}.num-error{color:#b00020}.num-note{font-size:12px;color:#666;line-height:1.5}
 
 .p-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.p-actions button{grid-column:1/-1}.p-head{font-size:16px;font-weight:800;margin:14px 0 8px}.p-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.p-box{border:1px solid #ddd;border-radius:12px;padding:10px;background:#fff}.p-box b{display:block;font-size:16px;margin-top:3px}.p-muted{font-size:12px;color:#666}.p-list{margin:6px 0;padding-left:20px}.p-table{width:100%;border-collapse:collapse}.p-table td,.p-table th{padding:8px;border-bottom:1px solid #ddd;text-align:left}.p-note{font-size:12px;color:#666;line-height:1.5;margin-top:12px}
-</style></head><body><main class="container"><h1>Study Mantra Astrology</h1>
-<div class="card" id="numerologyTab"><h2>🔢 Numerology — अंक ज्योतिष</h2><p class="num-muted">नाम और जन्मतिथि से पारंपरिक अंक-ज्योतिष के मुख्य अंक निकालें।</p><div class="num-actions"><input id="n" placeholder="Name (English spelling)" autocomplete="name"><input id="d" type="date"><button id="calcNum">Calculate</button></div><p id="numError" class="num-error"></p><div id="numResult"></div></div>
-<div class="card"><h2>🔮 Daily Horoscope</h2><select id="s"><option value="1">Mesha</option><option value="2">Vrishabha</option><option value="3">Mithuna</option><option value="4">Karka</option><option value="5">Simha</option><option value="6">Kanya</option><option value="7">Tula</option><option value="8">Vrishchika</option><option value="9">Dhanu</option><option value="10">Makara</option><option value="11">Kumbha</option><option value="12">Meena</option></select><button onclick="H()">View</button><pre id="ho"></pre></div>
-<div class="card" id="panchangTab"><h2>🚩 श्री गणेशाय नमः 🚩</h2><h3>📜 दैनिक पंचांग 📜</h3><div class="p-actions"><input id="p" type="date"><input id="pPlace" value="New Delhi, India" placeholder="स्थान"><input id="pLat" type="number" step="0.000001" value="28.6139" placeholder="Latitude"><input id="pLon" type="number" step="0.000001" value="77.2090" placeholder="Longitude"><input id="pTz" type="number" step="0.5" value="5.5" placeholder="Timezone"><button onclick="P()">आज का पंचांग देखें</button></div><p id="pErr" class="num-error"></p><div id="pResult"></div></div>
-<div class="card"><h2>❤️ Kundli Matching</h2><input id="an" placeholder="Person A name"><input id="ad" type="date"><input id="bn" placeholder="Person B name"><input id="bd" type="date"><button onclick="M()">Calculate</button><pre id="mo"></pre></div>
-<div class="card"><h2>💬 Chat with Astrologer</h2><p>Live Chat, chat requests, messages and saved Kundli sharing are available in the dashboard.</p><a href="/dashboard.html">Open Dashboard</a></div>
+.tool-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.tool-top a{padding:8px 10px;border:1px solid #ddd;border-radius:10px;text-decoration:none;color:inherit;font-size:13px}.tool-top span{font-weight:800}.tool-section{display:none}.tool-section.is-active{display:block}.section-note{font-size:13px;color:#666}
+</style></head><body><main class="container">
+<div class="tool-top"><a href="/">← Home</a><span id="toolTitle">Study Mantra Astrology</span><a href="/tools.html">सभी Tools</a></div>
+<h1 id="pageHeading">Study Mantra Astrology</h1>
+<div class="card tool-section" id="numerologyTab" data-section="numerology"><h2>🔢 Numerology — अंक ज्योतिष</h2><p class="num-muted">नाम और जन्मतिथि से पारंपरिक अंक-ज्योतिष के मुख्य अंक निकालें।</p><div class="num-actions"><input id="n" placeholder="Name (English spelling)" autocomplete="name"><input id="d" type="date"><button id="calcNum">Calculate</button></div><p id="numError" class="num-error"></p><div id="numResult"></div></div>
+<div class="card tool-section" id="horoscope" data-section="horoscope"><h2>🔮 Daily Horoscope</h2><select id="s"><option value="1">Mesha</option><option value="2">Vrishabha</option><option value="3">Mithuna</option><option value="4">Karka</option><option value="5">Simha</option><option value="6">Kanya</option><option value="7">Tula</option><option value="8">Vrishchika</option><option value="9">Dhanu</option><option value="10">Makara</option><option value="11">Kumbha</option><option value="12">Meena</option></select><button onclick="H()">View</button><pre id="ho"></pre></div>
+<div class="card tool-section" id="panchangTab" data-section="panchang"><h2>🚩 श्री गणेशाय नमः 🚩</h2><h3>📜 दैनिक पंचांग 📜</h3><div class="p-actions"><input id="p" type="date"><input id="pPlace" value="New Delhi, India" placeholder="स्थान"><input id="pLat" type="number" step="0.000001" value="28.6139" placeholder="Latitude"><input id="pLon" type="number" step="0.000001" value="77.2090" placeholder="Longitude"><input id="pTz" type="number" step="0.5" value="5.5" placeholder="Timezone"><button onclick="P()">आज का पंचांग देखें</button></div><p id="pErr" class="num-error"></p><div id="pResult"></div></div>
+<div class="card tool-section" id="matching" data-section="matching"><h2>❤️ Kundli Matching</h2><input id="an" placeholder="Person A name"><input id="ad" type="date"><input id="bn" placeholder="Person B name"><input id="bd" type="date"><button onclick="M()">Calculate</button><pre id="mo"></pre></div>
+<div class="card tool-section" id="muhurat" data-section="muhurat">
+<h2>🕉️ Muhurat — शुभ मुहूर्त</h2>
+<p>यहाँ विवाह, गृह प्रवेश, वाहन, संपत्ति, नामकरण, मुंडन, उपनयन, यात्रा और अन्य कार्यों के लिए मुहूर्त module खुलेगा।</p>
+<div class="num-grid">
+  <div class="num-box"><span>विवाह</span><b>शुभ समय</b></div>
+  <div class="num-box"><span>गृह प्रवेश</span><b>शुभ समय</b></div>
+  <div class="num-box"><span>वाहन</span><b>शुभ समय</b></div>
+  <div class="num-box"><span>व्यवसाय</span><b>शुभ समय</b></div>
+</div>
+<p class="num-note">मुहूर्त की वास्तविक तारीख/समय गणना को इसी section में अलग रखा जाएगा; दूसरे tools का output यहाँ नहीं दिखेगा।</p>
+</div>
+<div class="card tool-section" id="chat" data-section="chat"><h2>💬 Chat with Astrologer</h2><p>Live Chat, chat requests, messages and saved Kundli sharing are available in the dashboard.</p><a href="/dashboard.html">Open Dashboard</a></div>
 <script>
+const sectionMeta={
+  numerology:{title:'अंक ज्योतिष — Numerology'},
+  panchang:{title:'दैनिक पंचांग — Panchang'},
+  matching:{title:'कुंडली मिलान — Matching'},
+  horoscope:{title:'राशिफल — Horoscope'},
+  muhurat:{title:'शुभ मुहूर्त — Muhurat'},
+  chat:{title:'ज्योतिषी Chat'}
+};
+(function(){
+  const params=new URLSearchParams(location.search);
+  const raw=params.get('section') || (location.hash ? location.hash.slice(1) : '');
+  const key=sectionMeta[raw] ? raw : 'all';
+  const cards=[...document.querySelectorAll('.tool-section')];
+  cards.forEach(c=>c.classList.toggle('is-active', key==='all' || c.dataset.section===key));
+  const title=key==='all'?'Study Mantra Astrology':sectionMeta[key].title;
+  document.title=title+' | Study Mantra';
+  document.getElementById('toolTitle').textContent=title;
+  document.getElementById('pageHeading').textContent=title;
+  if(key!=='all') document.querySelector('.tool-top a:last-child').href='/tools.html';
+})();
 const $=id=>document.getElementById(id), esc=v=>String(v??"—").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function post(u,b){let r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});let j=await r.json();if(!r.ok)throw new Error(j.error||"Calculation failed");return j}
 function box(label,value){return `<div class="num-box"><span>${esc(label)}</span><b>${esc(value)}</b></div>`}
