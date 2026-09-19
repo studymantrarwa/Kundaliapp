@@ -60,3 +60,6 @@ V5 does not claim that every astrology feature is production-validated. Planetar
 
 ## V7
 Role-aware User/Astrologer/Admin dashboard UI, chat UI foundation, browser Supabase client, Realtime message subscription, and deployment environment documentation. Legacy JSON routes remain until the next Supabase backend migration.
+
+## V9 Auth Upgrade
+Added `public/auth.html` for Supabase Login/Signup, password reset, session/token synchronization, and a Home-page Account/Login entry point. Existing systems are preserved. See `docs/SUPABASE_AUTH_SETUP.md`.

@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Mantra — Dashboard</title>
+<link rel="stylesheet" href="/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-client.js"></script>
+<style>
+body{margin:0;background:#f5f7fb;color:#172033;font-family:system-ui,sans-serif}.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:#111827;color:#fff;padding:18px;position:sticky;top:0;height:100vh;box-sizing:border-box}aside h2{margin-top:0}.nav button{display:block;width:100%;text-align:left;background:transparent;color:#fff;border:0;padding:11px;border-radius:9px;margin:3px 0;cursor:pointer}.nav button:hover,.nav button.active{background:#263244}
+main{padding:18px;max-width:1200px;width:100%;box-sizing:border-box}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.card{background:#fff;border:1px solid #e2e7ef;border-radius:14px;padding:16px;box-shadow:0 4px 18px #0000000a}.muted{color:#667085;font-size:13px}.btn{border:0;border-radius:9px;padding:9px 13px;cursor:pointer}.danger{background:#fee2e2}.chat{display:grid;grid-template-columns:260px 1fr;gap:12px}.list{max-height:520px;overflow:auto}.conv{padding:10px;border-bottom:1px solid #eee;cursor:pointer}.conv.active{background:#eef2ff}.messages{height:420px;overflow:auto;border:1px solid #eee;border-radius:10px;padding:10px;background:#fafafa}.msg{padding:8px 10px;margin:6px 0;border-radius:10px;background:#fff;max-width:80%}.mine{margin-left:auto}.composer{display:flex;gap:8px;margin-top:8px}.composer input{flex:1;padding:11px;border:1px solid #ddd;border-radius:9px}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{position:relative;height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}.chat{grid-template-columns:1fr}.messages{height:50vh}}
+</style></head><body>
+<div class="app"><aside><h2>Study Mantra</h2><div id="identity" class="muted" style="color:#cbd5e1"></div><div class="nav" id="nav"></div><button class="btn danger" id="logout">Logout</button></aside>
+<main><div class="top"><h1 id="title">Dashboard</h1><span id="status" class="muted"></span></div><div id="content"></div></main></div>
+<script>
+const $=s=>document.querySelector(s), token=localStorage.getItem("studyMantraToken");
+let me=null, activeConv=null, channel=null;
+
+async function api(url,opts={}){opts.headers={...(opts.headers||{}),...(token?{Authorization:"Bearer "+token}:{})};const r=await fetch(url,opts);const j=await r.json();if(!r.ok)throw Error(j.error||"Request failed");return j}
+function card(title,body){return `<div class="card"><h3>${title}</h3>${body}</div>`}
+function navFor(role){
+ const common=[["home","Overview"]];
+ if(role==="user") common.push(["kundli","My Kundlis"],["astrologers","Astrologers"],["chat","Live Chat"],["reviews","My Reviews"]);
+ if(role==="astrologer") common.push(["profile","Astrologer Profile"],["requests","Chat Requests"],["kundli","User Kundlis"],["chat","Live Chat"],["reviews","Reviews"]);
+ if(role==="admin") common.push(["users","Users"],["astrologers","Astrologer Approval"],["chat","Chat Monitor"],["reviews","Reviews"]);
+ $("#nav").innerHTML=common.map(x=>`<button data-page="${x[0]}">${x[1]}</button>`).join("");
+ document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>show(b.dataset.page));
+}
+function setTitle(x){$("#title").textContent=x;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===x))}
+async function show(page){
+ if(!me)return; setTitle(page); const c=$("#content");
+ if(page==="home") c.innerHTML='<div class="cards">'+card("Role",me.user.role)+card("Account",me.user.email||"") + card("Kundli","Create and view calculations") + card("Chat","Realtime conversation module")+'</div>';
+ else if(page==="kundli") await kundliPage(c);
+ else if(page==="astrologers") await astrologerPage(c);
+ else if(page==="profile") c.innerHTML=card("Astrologer profile","Profile editing foundation. Admin verification is required before public listing.");
+ else if(page==="requests") c.innerHTML=card("Chat Requests","Incoming request list is ready for the Supabase conversation table.");
+ else if(page==="users") c.innerHTML=card("Users","Admin user-management foundation. RLS keeps role data server-controlled.");
+ else if(page==="reviews") c.innerHTML=card("Reviews","Review and rating records are stored per conversation.");
+ else if(page==="chat") await chatPage(c);
+}
+async function kundliPage(c){
+ let x; try{x=await api("/api/my-kundlis")}catch(e){x={kundlis:[]}}
+ const rows=(x.kundlis||[]).map(k=>`<div class="card"><b>${k.name||"Kundli"}</b><div class="muted">${k.dob||""} · ${k.place||""}</div></div>`).join("");
+ c.innerHTML=`<div class="cards">${rows||card("No Kundli yet","Use the Kundli form to create one.")}</div><p><a href="/kundli.html">Open Kundli Chart</a></p>`;
+}
+async function astrologerPage(c){
+ let x; try{x=await api("/api/astrologers")}catch(e){x={astrologers:[]}}
+ const rows=(x.astrologers||[]).map(a=>`<div class="card"><b>${a.name||a.email||"Astrologer"}</b><div class="muted">Fee: ${a.fee??"-"} · Discount: ${a.discount??0}% · ${a.online?"Online":"Offline"}</div><button class="btn" onclick="requestChat('${a.id||a.user_id||""}')">Request Chat</button></div>`).join("");
+ c.innerHTML=`<div class="cards">${rows||card("No verified astrologers","Verified astrologers will appear here.")}</div>`;
+}
+async function requestChat(id){
+ if(!id)return alert("Astrologer id unavailable in this foundation.");
+ try{await api("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({astrologer_id:id,action:"request"})});alert("Chat request sent.");}catch(e){alert(e.message)}
+}
+async function chatPage(c){
+ let x={conversations:[]}; try{x=await api("/api/chat")}catch(e){}
+ const list=(x.conversations||[]).map(v=>`<div class="conv" data-id="${v.id}"><b>${v.title||v.astrologer_name||v.user_name||"Conversation"}</b><div class="muted">${v.status||""}</div></div>`).join("");
+ c.innerHTML=`<div class="chat"><div class="card list">${list||"No conversations yet."}</div><div class="card"><div id="messages" class="messages">Select a conversation.</div><div class="composer"><input id="message" placeholder="Type a message…"><button class="btn" id="send">Send</button></div></div></div>`;
+ document.querySelectorAll(".conv").forEach(v=>v.onclick=()=>openConv(v.dataset.id));
+ $("#send").onclick=sendMsg;
+}
+async function openConv(id){
+ activeConv=id; document.querySelectorAll(".conv").forEach(v=>v.classList.toggle("active",v.dataset.id===id));
+ const box=$("#messages"); if(!box)return;
+ let x={messages:[]}; try{x=await api("/api/chat/"+encodeURIComponent(id))}catch(e){}
+ box.innerHTML=(x.messages||[]).map(m=>`<div class="msg ${m.sender_id===me.user.id?"mine":""}">${escapeHtml(m.body)}</div>`).join("")||"No messages.";
+ if(channel) channel.unsubscribe();
+ const sb=await window.SM_SUPABASE.init();
+ if(sb){
+   channel=sb.channel("conversation-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},payload=>{
+     const m=payload.new; box.insertAdjacentHTML("beforeend",`<div class="msg ${m.sender_id===me.user.id?"mine":""}">${escapeHtml(m.body)}</div>`);box.scrollTop=box.scrollHeight;
+   }).subscribe();
+ }
+}
+async function sendMsg(){
+ const input=$("#message"); if(!activeConv||!input.value.trim())return;
+ try{await api("/api/chat/"+encodeURIComponent(activeConv),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:input.value.trim()})});input.value="";openConv(activeConv)}catch(e){alert(e.message)}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+(async()=>{
+ try{const x=await api("/api/me");me=x;if(!me.user)throw Error("Login required");$("#identity").textContent=(me.user.email||"")+" · "+me.user.role;navFor(me.user.role);show("home");}
+ catch(e){$("#content").innerHTML=card("Login required",`<p>${e.message}</p>`)}
+})();
+$("#logout").onclick=()=>{localStorage.removeItem("studyMantraToken");location.href="/"}
+</script><a href="/kundli-form.html" style="display:inline-block;margin:10px">🪐 New Free Kundli</a></body></html>

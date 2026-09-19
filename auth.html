@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Login / Signup — Study Mantra</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-client.js"></script>
+<style>
+:root{--bg:#050505;--card:#111;--line:#2b2b2b;--gold:#ffc400;--muted:#aaa;--white:#fff;--green:#35c276}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#241d08 0,#090909 32%,#050505 70%);color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans Devanagari",sans-serif;padding:18px}
+a{color:inherit;text-decoration:none}.wrap{width:min(470px,100%);margin:0 auto}.top{display:flex;align-items:center;gap:12px;margin:4px 0 22px}.back{font-size:25px}.brand{font-size:21px;font-weight:900;flex:1}.card{background:rgba(17,17,17,.96);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 40px #0008}.logo{width:64px;height:64px;border-radius:18px;border:2px solid var(--gold);display:grid;place-items:center;color:var(--gold);font-size:32px;margin:0 auto 12px}.title{text-align:center;margin:0}.sub{text-align:center;color:var(--muted);font-size:13px;margin:7px 0 20px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:#0a0a0a;padding:5px;border-radius:12px;margin-bottom:18px}.tabs button{border:0;background:transparent;color:#999;padding:10px;border-radius:9px;font-weight:800;font-size:14px}.tabs button.active{background:#202020;color:#fff}.field{margin:11px 0}.field label{display:block;font-size:13px;color:#ddd;margin-bottom:6px}.field input{width:100%;padding:13px;border-radius:11px;border:1px solid #363636;background:#090909;color:#fff;outline:none}.field input:focus{border-color:var(--gold)}.primary{width:100%;padding:13px;border:0;border-radius:11px;background:var(--gold);color:#111;font-weight:900;font-size:15px;margin-top:8px}.secondary{width:100%;padding:11px;border:1px solid #444;border-radius:11px;background:#151515;color:#fff;font-weight:700;margin-top:9px}.hint{text-align:center;color:#8e8e8e;font-size:12px;line-height:1.5;margin-top:14px}.msg{display:none;margin:12px 0;padding:11px;border-radius:10px;font-size:13px;line-height:1.45}.msg.show{display:block}.msg.error{background:#3b1010;border:1px solid #6b2222;color:#ffb4b4}.msg.ok{background:#0d2b1c;border:1px solid #1e6a43;color:#aaf0c9}.hidden{display:none!important}.forgot{text-align:right;margin-top:7px;font-size:12px;color:#ddd}.forgot button{background:none;border:0;color:#ddd;text-decoration:underline;cursor:pointer}.footer{text-align:center;color:#777;font-size:11px;margin:18px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="/">‹</a><div class="brand">☀ Study Mantra</div></div>
+  <div class="card">
+    <div class="logo">ॐ</div><h1 class="title">Account</h1><div class="sub">Login या नया account बनाकर Study Mantra के personal features इस्तेमाल करें।</div>
+    <div class="tabs"><button id="loginTab" class="active">Login</button><button id="signupTab">Sign Up</button></div>
+    <div id="msg" class="msg"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••••"></div>
+      <div class="forgot"><button type="button" id="forgotBtn">Password भूल गए?</button></div>
+      <button class="primary" type="submit">Login करें</button>
+    </form>
+    <form id="signupForm" class="hidden">
+      <div class="field"><label>पूरा नाम</label><input id="signupName" type="text" autocomplete="name" required placeholder="आपका नाम"></div>
+      <div class="field"><label>Email</label><input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="signupPassword" type="password" autocomplete="new-password" required minlength="6" placeholder="कम से कम 6 characters"></div>
+      <div class="field"><label>Confirm Password</label><input id="signupConfirm" type="password" autocomplete="new-password" required minlength="6" placeholder="Password दोबारा लिखें"></div>
+      <button class="primary" type="submit">Sign Up करें</button>
+    </form>
+    <button class="secondary" id="guestBtn" type="button">बिना Login के Home पर जाएँ</button>
+    <div class="hint">Authentication Supabase Auth से होगा। Password इस website के local JSON में store नहीं किया जाता।</div>
+  </div>
+  <div class="footer">Study Mantra Astrology • Secure authentication</div>
+</div>
+<script>
+const $=s=>document.querySelector(s); let sb=null;
+function message(text,type='error'){const el=$('#msg');el.textContent=text;el.className='msg show '+type}
+function clearMsg(){const el=$('#msg');el.className='msg';el.textContent=''}
+function show(mode){clearMsg();const login=mode==='login';$('#loginTab').classList.toggle('active',login);$('#signupTab').classList.toggle('active',!login);$('#loginForm').classList.toggle('hidden',!login);$('#signupForm').classList.toggle('hidden',login)}
+async function client(){if(sb)return sb;sb=await window.SM_SUPABASE.init();if(!sb)throw Error('Supabase configure नहीं है। पहले Vercel/Supabase environment variables सेट करें।');return sb}
+async function syncToken(session){if(session?.access_token)localStorage.setItem('studyMantraToken',session.access_token);else localStorage.removeItem('studyMantraToken')}
+$('#loginTab').onclick=()=>show('login');$('#signupTab').onclick=()=>show('signup');$('#guestBtn').onclick=()=>location.href='/';
+$('#loginForm').onsubmit=async e=>{e.preventDefault();clearMsg();const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;try{const s=await client();const {data,error}=await s.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value});if(error)throw error;await syncToken(data.session);message('Login सफल हुआ। Dashboard खोला जा रहा है…','ok');setTimeout(()=>location.href='/dashboard.html',350)}catch(err){message(err.message||'Login failed')}finally{btn.disabled=false}};
+$('#signupForm').onsubmit=async e=>{e.preventDefault();clearMsg();const name=$('#signupName').value.trim(),email=$('#signupEmail').value.trim(),password=$('#signupPassword').value,confirm=$('#signupConfirm').value;if(password!==confirm)return message('दोनों passwords एक जैसे होने चाहिए।');const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;try{const s=await client();const {data,error}=await s.auth.signUp({email,password,options:{data:{full_name:name}}});if(error)throw error;await syncToken(data.session);if(data.session){message('Account बन गया। Dashboard खोला जा रहा है…','ok');setTimeout(()=>location.href='/dashboard.html',350)}else{message('Signup सफल हुआ। आपके email पर confirmation link भेजा गया है। Email confirm करने के बाद Login करें।','ok');show('login');$('#loginEmail').value=email}}catch(err){message(err.message||'Signup failed')}finally{btn.disabled=false}};
+$('#forgotBtn').onclick=async()=>{clearMsg();const email=$('#loginEmail').value.trim();if(!email)return message('पहले अपना email लिखें।');try{const s=await client();const {error}=await s.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/auth.html?reset=1'});if(error)throw error;message('Password reset link आपके email पर भेज दिया गया है।','ok')}catch(err){message(err.message||'Reset failed')}};
+(async()=>{try{const s=await client();const {data}=await s.auth.getSession();if(data.session){await syncToken(data.session);message('आप पहले से logged in हैं। Dashboard खोला जा रहा है…','ok');setTimeout(()=>location.href='/dashboard.html',400)}}catch(e){}})();
+</script>
+</body></html>

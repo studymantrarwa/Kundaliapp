@@ -9,6 +9,7 @@ function auth(req){const h=req.headers.authorization||"";try{const x=JSON.parse(
 function token(u){return Buffer.from(JSON.stringify({id:u.id,exp:Date.now()+86400000})).toString("base64url")}
 async function api(req,res,u){
  const D=db();
+ if(u.pathname==="/api/config"){return send(res,200,{supabaseUrl:process.env.SUPABASE_URL||"",supabaseAnonKey:process.env.SUPABASE_ANON_KEY||"",supabaseEnabled:!!(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY)})}
  if(req.method==="POST"&&u.pathname==="/api/register"){const b=await body(req);if(D.users.some(x=>x.email===b.email))return send(res,409,{error:"Email exists"});const x={id:"u"+Date.now(),name:b.name,email:b.email,password:b.password,role:b.role==="astrologer"?"astrologer":"user",verified:false,fee:0,discount:0,online:false};D.users.push(x);save(D);return send(res,201,{token:token(x),user:{...x,password:undefined}})}
  if(req.method==="POST"&&u.pathname==="/api/login"){const b=await body(req),x=D.users.find(v=>v.email===b.email&&v.password===b.password);if(!x)return send(res,401,{error:"Invalid login"});return send(res,200,{token:token(x),user:{...x,password:undefined}})}
  if(u.pathname==="/api/me"){const x=auth(req);return x?send(res,200,{user:{...x,password:undefined}}):send(res,401,{error:"Login required"})}
