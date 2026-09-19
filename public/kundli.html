@@ -32,7 +32,7 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 <section class="card"><h2>D1 / Rashi / Lagna — North Indian</h2><div id="d1"></div><p class="legend">North Indian fixed-house layout. केवल राशि संख्या दिखाई जाती है; सभी संख्या और ग्रह-चिह्न chart की सीमा के अंदर रखे गए हैं।</p></section>
 <section class="card"><h2>D9 / Navamsa — North Indian</h2><div id="d9"></div><p class="legend">D9 में केवल राशि संख्या दिखाई जाती है। Navamsa placement standard movable/fixed/dual starting rule से है।</p></section>
 </div>
-<div class="card"><h2>Planetary positions</h2><div class="scroll"><table class="table"><thead><tr><th>Planet</th><th>Sign</th><th>House</th><th>Degree</th><th>Nakshatra</th><th>Pada</th><th>R</th></tr></thead><tbody id="planets"></tbody></table></div></div>
+<div class="card"><h2>Planetary positions</h2><div class="scroll"><table class="table"><thead><tr><th>Planet</th><th>Sign</th><th>House</th><th>Degree (Rashi)</th><th>Nakshatra</th><th>Pada</th><th>R</th></tr></thead><tbody id="planets"></tbody></table></div></div>
 <div class="card"><h2>Vimshottari Dasha</h2><div id="dasha"></div></div>
 <div class="grid"><div class="card"><h2>Shubh Yog</h2><div id="yogas"></div></div><div class="card"><h2>Ashubh Yog / Dosha</h2><div id="doshas"></div></div></div>
 </div>
@@ -65,7 +65,7 @@ document.getElementById("timeDetails").innerHTML=table([
 ]);
 const fp=bd.favourablePoints||{};
 document.getElementById("numberDetails").innerHTML=table([
- ["जन्मांक",num.birthNumber],["भाग्यांक",num.lifePath],["शुभ अंक",(fp.goodNumbers||num.luckyNumbers||[]).join(", ")],["अशुभ अंक",(fp.evilNumbers||num.unluckyNumbers||[]).join(", ")],["शुभ वर्ष",(fp.goodYears||num.luckyYears||[]).join(", ")],["भाग्यशाली दिन",(fp.luckyDays||num.luckyDays||[]).join(", ")],["शुभ ग्रह",(fp.goodPlanets||[]).join(", ")],["अशुभ ग्रह",(fp.evilPlanets||[]).join(", ")],["मित्र राशियां",(fp.friendlySigns||[]).join(", ")],["शुभ लग्न",(fp.goodLagna||[]).join(", ")],["भाग्यशाली धातु",fp.luckyMetal],["भाग्यशाली रत्न",fp.luckyStone],["आधार",fp.basis||num.note]
+ ["जन्मांक",num.birthNumber],["भाग्यांक",num.lifePath],["नामांक (Chaldean)",num.nameNumberChaldean],["नामांक (Pythagorean)",num.nameNumberPythagorean],["Soul Number",num.soulNumber],["Personality Number",num.personalityNumber],["Attitude Number",num.attitudeNumber],["Maturity Number",num.maturityNumber],["Personal Year",num.personalYear],["Personal Month",num.personalMonth],["Personal Day",num.personalDay],["शुभ अंक",(fp.goodNumbers||num.luckyNumbers||[]).join(", ")],["अशुभ अंक",(fp.evilNumbers||num.unluckyNumbers||[]).join(", ")],["शुभ वर्ष",(fp.goodYears||num.luckyYears||[]).join(", ")],["भाग्यशाली दिन",(fp.luckyDays||num.luckyDays||[]).join(", ")],["शुभ ग्रह",(fp.goodPlanets||[]).join(", ")],["अशुभ ग्रह",(fp.evilPlanets||[]).join(", ")],["मित्र राशियां",(fp.friendlySigns||[]).join(", ")],["शुभ लग्न",(fp.goodLagna||[]).join(", ")],["भाग्यशाली धातु",fp.luckyMetal],["भाग्यशाली रत्न",fp.luckyStone],["आधार",fp.basis||num.note]
 ]);
 const gh=bd.ghatak||{};
 document.getElementById("ghatakDetails").innerHTML=table([
@@ -193,7 +193,7 @@ function chartSvg(ch){
 function renderChart(id,ch){document.getElementById(id).innerHTML='<div class="chart">'+chartSvg(ch)+'</div>'}
 renderChart('d1',data.charts.D1); renderChart('d9',data.charts.D9);
 
-const rows=Object.values(data.planets||{}).map(p=>`<tr><td>${p.name}</td><td>${p.signName}</td><td>${p.house}</td><td>${p.longitude.toFixed(4)}°</td><td>${p.nakshatra.name}</td><td>${p.nakshatra.pada}</td><td>${p.retrograde?"Yes":"No"}</td></tr>`).join("");
+const rows=Object.values(data.planets||{}).map(p=>`<tr><td>${p.name}</td><td>${p.signName}</td><td>${p.house}</td><td><b>${Number(p.degreeInSign??(p.longitude%30)).toFixed(4)}°</b><br><small>${p.degreeDms||""}</small></td><td>${p.nakshatra.name}</td><td>${p.nakshatra.pada}</td><td>${p.retrograde?"Yes":"No"}</td></tr>`).join("");
 document.getElementById("planets").innerHTML=rows;
 
 document.getElementById("yogas").innerHTML=(data.yogas||[]).length?(data.yogas.map(x=>`<div class="badge">${x.name}<br><small>${x.basis}</small></div>`).join("")):`<p>No configured Shubh Yoga rule matched for this chart.</p><small>${data.ruleSummary?.yogaRulesChecked||0} yoga rules checked.</small>`;
