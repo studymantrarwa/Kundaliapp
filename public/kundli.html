@@ -14,13 +14,20 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 .legend{font-size:12px;color:#667085}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}
 .table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #eee;padding:7px;text-align:left}
-.scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}
+.scroll{overflow:auto}.warn{padding:10px;border-radius:10px;background:#fff4d6;color:#754d00}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-table{width:100%;border-collapse:collapse;font-size:13px}.detail-table td{border-bottom:1px solid #edf0f4;padding:8px 6px;vertical-align:top}.detail-table td:first-child{font-weight:700;color:#475467;width:42%}.section-title{margin:4px 0 12px}.note{font-size:12px;color:#667085;line-height:1.5}.phala{line-height:1.7}.phala li{margin:5px 0}@media(max-width:760px){.detail-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.chart-shell{grid-template-columns:1fr}.wrap{padding:10px}.grid{grid-template-columns:1fr}.chart{max-width:96vw;margin:auto}}
 </style></head><body>
 <div class="wrap">
 <div class="top"><h1>Study Mantra Kundli</h1><button onclick="location.href='/kundli-form.html'">← New Kundli</button></div>
 <div id="meta" class="card">Loading calculation…</div>
 <div id="accuracy" class="card"></div>
+<div class="card"><h2 class="section-title">व्यक्ति विवरण</h2><div id="personDetails"></div></div>
+<div class="card"><h2 class="section-title">जन्म पंचांग / अवकहड़ा विवरण</h2><div id="panchangDetails"></div></div>
+<div class="card"><h2 class="section-title">जन्म कुंडली के मुख्य विवरण</h2><div id="chartDetails"></div></div>
+<div class="card"><h2 class="section-title">समय एवं खगोलीय विवरण</h2><div id="timeDetails"></div></div>
+<div class="card"><h2 class="section-title">अनुकूल बिन्दु / भाग्य विवरण</h2><div id="numberDetails"></div></div>
+<div class="card"><h2 class="section-title">घटक (अशुभ) — जन्म राशि आधारित</h2><div id="ghatakDetails"></div><p class="note">यह पारंपरिक घटक-चक्र की एक प्रकाशित तालिका पर आधारित है; अलग परंपराओं में तालिका बदल सकती है।</p></div>
+<div class="card"><h2 class="section-title">जन्म फलादेश</h2><div id="phala" class="phala"></div></div>
 <div class="chart-shell">
 <section class="card"><h2>D1 / Rashi / Lagna — North Indian</h2><div id="d1"></div><p class="legend">North Indian fixed-house layout. House 1 is the top-centre diamond. Signs are assigned from Lagna.</p></section>
 <section class="card"><h2>D9 / Navamsa — North Indian</h2><div id="d9"></div><p class="legend">D9 uses the standard movable/fixed/dual Navamsa starting rule.</p></section>
@@ -34,10 +41,37 @@ const data=JSON.parse(localStorage.getItem("studyMantraLastKundli")||"null");
 if(!data){document.getElementById("meta").textContent="No Kundli data found. Please create a new Kundli.";throw new Error("No data")}
 const S=["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrischika","Dhanu","Makara","Kumbha","Meena"];
 const short={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"};
-document.getElementById("meta").innerHTML="<b>"+(data.input?.name||"Kundli")+"</b> · "+(data.input?.dob||"")+" "+(data.input?.time||"")+" · "+(data.input?.place||"")+"<br>Lagna: <b>"+data.lagna.signName+"</b> · Ayanamsa: "+data.ayanamsa;
+const esc=v=>String(v??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const bd=data.birthDetails||{};
+const p=bd.person||{}, pc=bd.panchangAtBirth||{}, bc=bd.birthChart||{}, td=bd.timeDetails||{}, astro=bd.astronomy||{}, num=bd.numerology||{};
+document.getElementById("meta").innerHTML=`<b>${esc(p.name||data.input?.name||"Kundli")}</b> · ${esc(p.dob||data.input?.dob||"")} ${esc(p.time||data.input?.time||"")} · ${esc(p.place||data.input?.place||"")}<br>लग्न: <b>${esc(bc.lagnaHi||data.lagna.signName)}</b> · राशि: <b>${esc(bc.rashiHi||"—")}</b> · नक्षत्र: <b>${esc(bc.nakshatraHi||"—")}</b> · अयनांश: ${esc(astro.ayanamsaName||data.ayanamsa)}`;
 document.getElementById("accuracy").innerHTML=data.engine?.productionRequired
 ?"<div class='warn'><b>Development fallback active.</b> This calculation is not production-accurate until a local Swiss Ephemeris bridge is configured.</div>"
 :"<div><b>Local Swiss Ephemeris provider active.</b> "+(data.engine?.accuracyNote||"")+"</div>";
+
+function table(rows){return `<table class="detail-table"><tbody>${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table>`}
+
+document.getElementById("personDetails").innerHTML=table([
+ ["नाम",p.name],["लिंग",p.genderHi],["दिनांक",p.dob],["समय",p.time],["दिन",p.weekday],["जन्म स्थान",p.place],["अक्षांश",Number.isFinite(p.latitude)?p.latitude.toFixed(5)+"° N":"—"],["रेखांश",Number.isFinite(p.longitude)?p.longitude.toFixed(5)+"° E":"—"],["टाइम जोन",p.timezone]
+]);
+document.getElementById("panchangDetails").innerHTML=table([
+ ["तिथि",`${pc.tithi?.name||"—"} (${pc.tithi?.paksha||"—"})`],["नक्षत्र",`${pc.nakshatra?.nameHi||pc.nakshatra?.name||"—"} · पद ${pc.nakshatra?.pada||"—"}`],["नक्षत्र स्वामी",pc.nakshatra?.lord],["नाड़ी",pc.nadi],["पाया (नक्षत्र आधारित)",pc.paya],["वर्ण",pc.varna],["योनि",pc.yoni],["गण",pc.gana],["वश्य",pc.vashya],["योग",pc.yoga?.name],["करण",pc.karana],["दशा भोग्य",`${bd.dashaBhogya?.lord||"—"} · ${bd.dashaBhogya?.display||"—"}`]
+]);
+document.getElementById("chartDetails").innerHTML=table([
+ ["लग्न",`${bc.lagnaHi||"—"} (${bc.lagna||"—"})`],["लग्न स्वामी",bc.lagnaLord],["राशि",`${bc.rashiHi||"—"} (${bc.rashi||"—"})`],["राशि स्वामी",bc.rashiLord],["नक्षत्र-पद",`${bc.nakshatraHi||"—"} ${bc.pada||"—"}`],["नक्षत्र स्वामी",bc.nakshatraLord],["सूर्य राशि (हिन्दू)",astro.sunSignHinduHi||astro.sunSignHindu],["सूर्य राशि (पाश्चात्य)",astro.sunSignWestern]
+]);
+document.getElementById("timeDetails").innerHTML=table([
+ ["इष्टकाल",td.ishtakaal],["स्थानीय औसत समय",td.localMeanTime],["स्थानीय समय संशोधन",td.localMeanTimeCorrection],["समय समीकरण / कालिक संशोधन",td.equationOfTime],["जन्म समय GMT",td.gmtBirthTime],["जुलियन दिन",td.julianDay],["अयनांश",`${astro.ayanamsa||"—"}°`],["अयनांश नाम",astro.ayanamsaName],["अक्ष से झुकाव",`${astro.obliquity||"—"}°`],["सूर्योदय",astro.sunrise],["सूर्यास्त",astro.sunset],["दिन अवधि",astro.dayDuration]
+]);
+const fp=bd.favourablePoints||{};
+document.getElementById("numberDetails").innerHTML=table([
+ ["जन्मांक",num.birthNumber],["भाग्यांक",num.lifePath],["शुभ अंक",(fp.goodNumbers||num.luckyNumbers||[]).join(", ")],["अशुभ अंक",(fp.evilNumbers||num.unluckyNumbers||[]).join(", ")],["शुभ वर्ष",(fp.goodYears||num.luckyYears||[]).join(", ")],["भाग्यशाली दिन",(fp.luckyDays||num.luckyDays||[]).join(", ")],["शुभ ग्रह",(fp.goodPlanets||[]).join(", ")],["अशुभ ग्रह",(fp.evilPlanets||[]).join(", ")],["मित्र राशियां",(fp.friendlySigns||[]).join(", ")],["शुभ लग्न",(fp.goodLagna||[]).join(", ")],["भाग्यशाली धातु",fp.luckyMetal],["भाग्यशाली रत्न",fp.luckyStone],["आधार",fp.basis||num.note]
+]);
+const gh=bd.ghatak||{};
+document.getElementById("ghatakDetails").innerHTML=table([
+ ["राशि",gh.moonRashi],["माह",gh.masa],["तिथि",gh.tithi],["दिन",gh.day],["नक्षत्र",gh.nakshatra],["प्रहर",gh.prahar],["लग्न",gh.lagna],["योग",gh.yoga],["करण",gh.karana]
+]);
+document.getElementById("phala").innerHTML=`<p><b>${esc(data.phalaDesh?.summary||"—")}</b></p><ul>${(data.phalaDesh?.points||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="note">${esc(data.phalaDesh?.note||"")}</p>`;
 
 function chartSvg(ch){
   const lines=[[0,0,100,100],[100,0,0,100],[50,0,0,50],[50,0,100,50],[0,50,50,100],[100,50,50,100]];
