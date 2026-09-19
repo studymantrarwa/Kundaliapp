@@ -63,3 +63,10 @@ Role-aware User/Astrologer/Admin dashboard UI, chat UI foundation, browser Supab
 
 ## V9 Auth Upgrade
 Added `public/auth.html` for Supabase Login/Signup, password reset, session/token synchronization, and a Home-page Account/Login entry point. Existing systems are preserved. See `docs/SUPABASE_AUTH_SETUP.md`.
+
+## Astrologer Panel — merged final
+- Direct entry URL: `/astrologer-dashboard.html`
+- Approved astrologer accounts are routed into `/dashboard.html` with Profile, Chat Requests, My Users/Kundlis, Live Chat and Reviews sections.
+- User signup includes User/Astrologer account type. Astrologer applications remain pending until Admin approval.
+- Run `supabase/astrologer-dashboard.sql` once in the Supabase SQL Editor after the base schema.
+- Existing Kundli, D1/D9, Dasha, Yoga/Dosha, Phalaadesh, Numerology, Panchang, Matching, Login/Signup and other files are retained; the astrologer changes are additive/intentional replacements of dashboard/auth/API gateway files.
