@@ -1,0 +1,12 @@
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Study Mantra — Astrologer Panel</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="app"><aside><h2>☀ Study Mantra</h2><div class="muted">Astrologer Panel</div><div class="nav" style="margin-top:18px"><a class="btn" href="/dashboard.html#profile">👤 Profile</a><a class="btn" href="/dashboard.html#requests">💬 Chat Requests</a><a class="btn" href="/dashboard.html#users">👥 My Users / Kundli</a><a class="btn" href="/dashboard.html#chat">💬 Live Chat</a><a class="btn" href="/dashboard.html#reviews">⭐ Reviews</a></div><a class="btn" href="/dashboard.html" style="display:block;margin-top:18px">← Dashboard</a></aside>
+<main><div class="card"><h1>🔮 Astrologer Panel</h1><p class="muted">अपने astrologer account को यहीं से manage करें।</p><div class="cards">
+<a class="card" href="/dashboard.html#profile"><h3>👤 Astrologer Profile</h3><p>Bio, experience, expertise, languages, fee, discount और online/offline status.</p></a>
+<a class="card" href="/dashboard.html#requests"><h3>💬 Chat Requests</h3><p>User की chat requests को accept/reject करें.</p></a>
+<a class="card" href="/dashboard.html#users"><h3>👥 My Users / Kundli</h3><p>Allowed users और उनकी Kundli देखें.</p></a>
+<a class="card" href="/dashboard.html#chat"><h3>💬 Live Chat</h3><p>User के साथ realtime chat करें.</p></a>
+<a class="card" href="/dashboard.html#reviews"><h3>⭐ Reviews</h3><p>Users के reviews देखें.</p></a>
+</div></div></main></div>
+<script>
+(async()=>{try{const r=await fetch('/api/index?route=me');const x=await r.json();if(!x.user){location.href='/auth.html';return}if(x.user.role!=='astrologer'){document.body.innerHTML='<main style="padding:30px"><div class="card"><h2>Astrologer access required</h2><p>यह panel केवल approved Astrologer account के लिए है.</p><a class="btn primary" href="/dashboard.html">Dashboard</a></div></main>'}}catch(e){location.href='/auth.html'}})();
+</script></body></html>
