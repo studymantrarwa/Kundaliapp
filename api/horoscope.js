@@ -1,0 +1,1 @@
+const {horoscope}=require("../lib/features-engine");module.exports=(req,res)=>res.json(horoscope(req.query.sign,req.query.date));

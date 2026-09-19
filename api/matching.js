@@ -1,0 +1,1 @@
+const {matching}=require("../lib/features-engine");module.exports=(req,res)=>req.method==="POST"?res.json(matching(req.body?.a||{},req.body?.b||{})):res.status(405).json({error:"Method not allowed"});

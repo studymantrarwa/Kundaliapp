@@ -1,0 +1,1 @@
+const {panchang}=require("../lib/features-engine");module.exports=(req,res)=>res.json(panchang(req.query||{}));
