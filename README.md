@@ -60,10 +60,3 @@ V5 does not claim that every astrology feature is production-validated. Planetar
 
 ## V7
 Role-aware User/Astrologer/Admin dashboard UI, chat UI foundation, browser Supabase client, Realtime message subscription, and deployment environment documentation. Legacy JSON routes remain until the next Supabase backend migration.
-
-## V9.1 Kundli Matching upgrade
-- Matching now collects the same core birth inputs as Free Kundli for both people: name, gender, date, exact birth time, and selected birth place with auto latitude/longitude/timezone.
-- Both complete birth charts are recalculated before matching; matching is not based on name/date-only shortcuts.
-- Ashtakoota/Gun Milan is calculated across Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot and Nadi (36 points), with both-person birth summaries and Manglik comparison.
-- The UI shows only the matching module when `section=matching` is selected.
-- Astrological results are traditional calculations and interpretations, not a scientific or guaranteed prediction. For highest-fidelity planetary positions in production, configure the local Swiss Ephemeris bridge and verify licensing.
