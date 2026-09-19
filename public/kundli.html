@@ -10,7 +10,7 @@ button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
 .chart{width:100%;aspect-ratio:1;border:2px solid #111;position:relative;background:#fff;overflow:hidden}
 .chart svg{width:100%;height:100%;display:block}
 .chart text{font-family:system-ui,sans-serif}
-.cell{font-size:5.2px;font-weight:900;fill:#111}.planet{font-size:3.35px;font-weight:800;fill:#8a1c1c}
+.cell{font-size:4.8px;font-weight:900;fill:#111}.planet{font-size:3.05px;font-weight:800;fill:#8a1c1c}
 .legend{font-size:12px;color:#667085}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px;font-size:12px}.dasha-tree details{border:1px solid #e4e8ef;border-radius:12px;margin:8px 0;background:#fff;overflow:hidden}.dasha-tree summary{cursor:pointer;list-style:none;padding:11px 12px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px}.dasha-tree summary::-webkit-details-marker{display:none}.dasha-tree summary:before{content:"▶";font-size:10px;transition:transform .15s}.dasha-tree details[open]>summary:before{transform:rotate(90deg)}.dasha-md>summary{color:#2457c5;background:#f5f7ff}.dasha-ad{margin:0 10px 8px}.dasha-ad>summary{color:#217a3a;background:#f1fbf3}.dasha-pd{margin:0 10px 8px}.dasha-pd>summary{color:#9a5b00;background:#fff8ea;font-weight:700}.dasha-body{padding:0 10px 2px}.dasha-dates{font-size:12px;color:#667085;font-weight:500}.dasha-empty{padding:10px 12px;color:#667085;font-size:13px}.dasha-help{font-size:12px;color:#667085;margin:0 0 10px;line-height:1.5}
 .table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #eee;padding:7px;text-align:left}
@@ -75,25 +75,34 @@ document.getElementById("phala").innerHTML=`<div class="phala-summary"><b>${esc(
 
 function chartSvg(ch){
   const lines=[[0,0,100,100],[100,0,0,100],[50,0,0,50],[50,0,100,50],[0,50,50,100],[100,50,50,100]];
-  // Safe interior anchor points for the 12 North-Indian sign cells.
-  // Only the rashi number is shown; the sign name is intentionally hidden.
-  const pos={
-    1:[50,25], 2:[27,18], 3:[19,34], 4:[27,50], 5:[19,66], 6:[27,82],
-    7:[50,75], 8:[73,82], 9:[81,66], 10:[73,50], 11:[81,34], 12:[73,18]
+  // Fixed North-Indian house cells. All content is clipped to the SVG viewport.
+  // Rashi number is shown only; the rashi name is intentionally hidden.
+  const cells={
+    1:{x:50,y:25},2:{x:25,y:17},3:{x:17,y:34},4:{x:25,y:50},5:{x:17,y:66},6:{x:25,y:83},
+    7:{x:50,y:75},8:{x:75,y:83},9:{x:83,y:66},10:{x:75,y:50},11:{x:83,y:34},12:{x:75,y:17}
   };
-  let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="North Indian kundli">';
+  const escSvg=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="North Indian kundli" overflow="hidden">';
   for(const l of lines)svg+=`<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#111" stroke-width=".65" vector-effect="non-scaling-stroke"/>`;
   for(const h of ch){
-    const p=pos[h.house]||[50,50];
-    const planets=h.planets||[];
-    // Rashi number only — no Hindi/English rashi name inside the chart.
-    svg+=`<text x="${p[0]}" y="${p[1]-2.5}" text-anchor="middle" dominant-baseline="middle" class="cell">${h.sign}</text>`;
-    const start=p[1]+3.5;
-    const step=3.7;
-    planets.forEach((x,i)=>{
-      const yy=start+i*step;
-      svg+=`<text x="${p[0]}" y="${yy}" text-anchor="middle" dominant-baseline="middle" class="planet">${short[x]||x}</text>`;
-    });
+    const c=cells[h.house]||cells[1];
+    const planets=(h.planets||[]).map(x=>short[x]||x);
+    // Keep every label safely inside its house. Two columns are used when a house
+    // contains many planets, preventing overlap while preserving the house cell.
+    const n=Math.min(planets.length,8);
+    svg+=`<text x="${c.x}" y="${c.y-4.2}" text-anchor="middle" dominant-baseline="middle" class="cell">${escSvg(h.sign)}</text>`;
+    if(n){
+      const cols=n>4?2:1;
+      const perCol=Math.ceil(n/cols);
+      const rowStep=n>6?3.25:3.7;
+      for(let i=0;i<n;i++){
+        const col=cols===2?(i>=perCol?1:0):0;
+        const row=cols===2?(i%perCol):i;
+        const x=c.x+(cols===2?(col?4.1:-4.1):0);
+        const y=c.y+1.0+row*rowStep;
+        svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" class="planet">${escSvg(planets[i])}</text>`;
+      }
+    }
   }
   return svg+'</svg>';
 }
