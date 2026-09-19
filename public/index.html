@@ -23,7 +23,7 @@ a{text-decoration:none;color:inherit}.top{height:70px;display:flex;align-items:c
 <header class="top">
   <a class="menu" href="/dashboard.html" aria-label="Menu">☰</a>
   <div class="brand">☀ Study Mantra</div>
-  <div class="top-actions"><a class="wallet" href="/dashboard.html">₹ 0</a><a class="bell" href="/dashboard.html">♧<i class="badge">0</i></a><a class="search" href="/tools.html">⌕</a></div>
+  <div class="top-actions"><a id="accountLink" class="wallet" href="/auth.html">Login</a><a class="bell" href="/dashboard.html">♧<i class="badge">0</i></a><a class="search" href="/tools.html">⌕</a></div>
 </header>
 <nav class="tabs"><a class="tab active" href="/">होम</a><a class="tab" href="/tools.html">2026</a><a class="tab" href="/tools.html">एस्ट्रो शॉप</a><a class="tab" href="/dashboard.html">परामर्श</a></nav>
 
@@ -84,5 +84,8 @@ a{text-decoration:none;color:inherit}.top{height:70px;display:flex;align-items:c
   <a href="/dashboard.html"><span class="bi">▤</span><span>मेरे परामर्श</span></a>
 </nav>
 </div>
+<script>
+(async()=>{try{const t=localStorage.getItem("studyMantraToken");if(!t)return;const r=await fetch("/api/me",{headers:{Authorization:"Bearer "+t}});if(r.ok){const j=await r.json();const a=document.getElementById("accountLink");if(a){a.textContent="Account";a.href="/dashboard.html"}}}catch(e){}})();
+</script>
 </body>
 </html>
