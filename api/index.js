@@ -2,6 +2,9 @@ const handlers = {
   "_lib": null,
   "admin-astrologer": require("../lib/api/admin-astrologer"),
   "astrologer-settings": require("../lib/api/astrologer-settings"),
+  "astrologer-profile": require("../lib/api/astrologer-profile"),
+  "astrologer-requests": require("../lib/api/astrologer-requests"),
+  "astrologer-users": require("../lib/api/astrologer-users"),
   "astrologers": require("../lib/api/astrologers"),
   "chat": require("../lib/api/chat"),
   "config": require("../lib/api/config"),
@@ -16,7 +19,8 @@ const handlers = {
   "panchang": require("../lib/api/panchang"),
   "places": require("../lib/api/places"),
   "profile": require("../lib/api/profile"),
-  "register": require("../lib/api/register")
+  "register": require("../lib/api/register"),
+  "reviews": require("../lib/api/reviews")
 };
 
 module.exports = async (req, res) => {
