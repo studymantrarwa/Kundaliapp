@@ -173,12 +173,9 @@ do $$ begin
   begin alter publication supabase_realtime add table public.conversations; exception when duplicate_object then null; when undefined_object then null; end;
 end $$;
 
--- Public astrologer photo storage bucket. Profile photos are public; write access is server-side in the app.
-insert into storage.buckets(id,name,public) values('astrologer-photos','astrologer-photos',true) on conflict (id) do update set public=true;
-
--- Public read of the bucket. Upload/delete is not granted to anonymous/authenticated clients.
-drop policy if exists "astrologer photos public read" on storage.objects;
-create policy "astrologer photos public read" on storage.objects for select using (bucket_id='astrologer-photos');
+-- Storage is intentionally not referenced here. Supabase Storage is a managed schema and may not be exposed in every project/setup.
+-- Astrologer registration uploads a photo when the managed bucket exists; if it does not, registration still succeeds and the UI uses the profile initials.
+-- If you want photo uploads, create a public bucket named astrologer-photos from Supabase Dashboard -> Storage.
 
 -- Helpful indexes
 create index if not exists idx_conv_retention on public.conversations(retention_until);
