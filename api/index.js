@@ -26,7 +26,8 @@ const handlers = {
   "payments": require("../lib/api/payments"),
   "profile": require("../lib/api/profile"),
   "register": require("../lib/api/register"),
-  "reviews": require("../lib/api/reviews")
+  "reviews": require("../lib/api/reviews"),
+  "follow": require("../lib/api/follow")
 };
 
 module.exports = async (req, res) => {

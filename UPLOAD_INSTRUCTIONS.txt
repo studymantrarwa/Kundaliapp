@@ -1,0 +1,12 @@
+STUDY MANTRA USER PANEL - 2 PART UPLOAD
+
+Upload BOTH parts into the SAME existing GitHub repository.
+
+1. Extract Part-1 and upload the CONTENTS of Part-1 into the repository root.
+2. Extract Part-2 and upload the CONTENTS of Part-2 into the SAME repository root.
+3. Do NOT upload the Part-1/ or Part-2/ folder itself.
+4. Do NOT delete existing files unless GitHub asks to replace an identical path from this package.
+5. Commit Part-1 first, then Part-2.
+6. After both commits, Vercel can deploy from the same repository.
+
+This package is split only to keep each upload under the GitHub mobile batch limit.
