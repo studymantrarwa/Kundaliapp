@@ -59,6 +59,18 @@ alter table public.astrologers add column if not exists boosted boolean not null
 alter table public.astrologers add column if not exists followers integer not null default 0;
 alter table public.astrologers add column if not exists education text default '';
 
+-- Astrologer follows
+create table if not exists public.astrologer_follows (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  astrologer_id uuid not null references public.astrologers(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique(user_id, astrologer_id)
+);
+alter table public.astrologer_follows enable row level security;
+drop policy if exists "users manage own astrologer follows" on public.astrologer_follows;
+create policy "users manage own astrologer follows" on public.astrologer_follows for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
+
 -- Payments / admin audit / settings
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
