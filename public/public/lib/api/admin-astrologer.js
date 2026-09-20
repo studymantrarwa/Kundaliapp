@@ -14,8 +14,8 @@ module.exports=async(req,res)=>{try{
   if(!apps[0])return json(res,404,{error:'Application not found'});
   if(status==='approved'){
    const a=apps[0];
-   await sbreq(`/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({role:'astrologer',updated_at:new Date().toISOString()})});
-   await sbreq('/rest/v1/astrologers',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({id:userId,bio:a.bio,experience_years:a.experience_years,expertise:a.expertise,languages:a.languages,fee:a.requested_fee,discount:0,online:false,verified:true,approved_at:new Date().toISOString()})});
+   await sbreq(`/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({role:'astrologer',avatar_url:a.avatar_url||null,updated_at:new Date().toISOString()})});
+   await sbreq('/rest/v1/astrologers',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({id:userId,bio:a.bio,experience_years:a.experience_years,expertise:a.expertise,languages:a.languages,fee:a.requested_fee,discount:0,avatar_url:a.avatar_url||null,online:false,verified:true,approved_at:new Date().toISOString()})});
   }
   const rows=await sbreq(`/rest/v1/astrologer_applications?id=eq.${encodeURIComponent(apps[0].id)}`,{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({status,admin_note:String(b.admin_note||''),updated_at:new Date().toISOString()})});
   return json(res,200,{application:rows[0]||null});
