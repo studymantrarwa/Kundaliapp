@@ -29,13 +29,13 @@ a{color:inherit;text-decoration:none}.wrap{width:min(470px,100%);margin:0 auto}.
       <div class="field"><label>पूरा नाम</label><input id="signupName" type="text" autocomplete="name" required placeholder="आपका नाम"></div>
       <div class="field"><label>Email</label><input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
       <div class="field"><label>Mobile Number</label><input id="signupPhone" type="tel" autocomplete="tel" placeholder="10 digit mobile number"></div>
-      <div class="field"><label>Account Type</label><select id="signupType" style="width:100%;padding:13px;border-radius:11px;border:1px solid #363636;background:#090909;color:#fff"><option value="user">User</option><option value="astrologer">Astrologer — Admin approval required</option></select></div>
+      <div class="field"><label>Account Type</label><select id="signupType" style="width:100%;padding:13px;border-radius:11px;border:1px solid #363636;background:#090909;color:#fff"><option value="user">User</option></select></div>
       <div class="field"><label>Password</label><input id="signupPassword" type="password" autocomplete="new-password" required minlength="6" placeholder="कम से कम 6 characters"></div>
       <div class="field"><label>Confirm Password</label><input id="signupConfirm" type="password" autocomplete="new-password" required minlength="6" placeholder="Password दोबारा लिखें"></div>
       <button class="primary" type="submit">Sign Up करें</button>
     </form>
     <button class="secondary" id="guestBtn" type="button">बिना Login के Home पर जाएँ</button>
-    <div class="hint">Authentication Supabase Auth से होगा। Password इस website के local JSON में store नहीं किया जाता।</div>
+    <div class="hint"><a href="/user-login.html" style="color:#ffc400;font-weight:800">User Login</a> · <a href="/user-register.html" style="color:#ffc400;font-weight:800">User Registration</a> · <a href="/astrologer-login.html" style="color:#ffc400;font-weight:800">Astrologer Login</a> · <a href="/admin-login.html" style="color:#ffc400;font-weight:800">Admin Login</a><br><br>Authentication Supabase Auth से होगा। Password इस website के local JSON में store नहीं किया जाता।<br><br><a href="/astrologer-register.html" style="color:#ffc400;font-weight:800">🔮 Astrologer के रूप में नया Registration करें</a></div>
   </div>
   <div class="footer">Study Mantra Astrology • Secure authentication</div>
 </div>
