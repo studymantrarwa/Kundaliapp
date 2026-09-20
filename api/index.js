@@ -3,10 +3,8 @@ const handlers = {
   "admin": require("../lib/api/admin"),
   "admin-register": require("../lib/api/admin-register"),
   "admin-astrologer": require("../lib/api/admin-astrologer"),
-  "astrologer-register": require("../lib/api/astrologer-register"),
-  "astrologer-apply": require("../lib/api/astrologer-apply"),
-  "shared-kundli": require("../lib/api/shared-kundli"),
   "astrologer-settings": require("../lib/api/astrologer-settings"),
+  "astrologer-panel": require("../lib/api/astrologer-panel"),
   "astrologer-profile": require("../lib/api/astrologer-profile"),
   "astrologer-requests": require("../lib/api/astrologer-requests"),
   "astrologer-users": require("../lib/api/astrologer-users"),
@@ -23,11 +21,9 @@ const handlers = {
   "numerology": require("../lib/api/numerology"),
   "panchang": require("../lib/api/panchang"),
   "places": require("../lib/api/places"),
-  "payments": require("../lib/api/payments"),
   "profile": require("../lib/api/profile"),
   "register": require("../lib/api/register"),
-  "reviews": require("../lib/api/reviews"),
-  "follow": require("../lib/api/follow")
+  "reviews": require("../lib/api/reviews")
 };
 
 module.exports = async (req, res) => {
